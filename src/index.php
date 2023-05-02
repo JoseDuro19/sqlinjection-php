@@ -26,14 +26,15 @@
 			# Connectem a MySQL (host,usuari,contrassenya)
 			$pdo = new PDO("mysql:host=$dbhost;dbname=$dbname",$dbuser,$dbpass);
 	 
-			$username = $_POST["user"];
-			$pass = $_POST["password"];
+			$username = htmlspecialchars($_POST["user"]);
+			$pass = htmlspecialchars($_POST["password"]);
 			# (2.1) creem el string de la consulta (query)
-			$qstr = "SELECT * FROM users WHERE name='$username' AND password=SHA2('$pass',512);";
+			$qstr = "SELECT * FROM users WHERE name=? AND password=SHA2(?,512);";
 			$consulta = $pdo->prepare($qstr);
 
-			# mostrem la SQL query per veure el què s'executarà (a mode debug)
-			echo "<br>$qstr<br>";
+			# Enviem els paràmetres a la consulta
+			$consulta->bindParam(1, $username);
+			$consulta->bindParam(2, $pass);
 
 			# Enviem la query al SGBD per obtenir el resultat
 			$consulta->execute();
@@ -58,7 +59,7 @@
  	<legend>Login form</legend>
   	<form method="post">
 		User: <input type="text" name="user" /><br>
-		Pass: <input type="text" name="password" /><br>
+		Pass: <input type="password" name="password" /><br>
 		<input type="submit" /><br>
  	</form>
   	</fieldset>
